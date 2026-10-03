@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لأجلكِ فقط ✨</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        :root {
+            --primary: #ff3838;
+            --primary-hover: #ff4d4d;
+            --accent: #d1d8e0;
+            --bg-gradient: linear-gradient(135deg, #07050b 0%, #151022 50%, #0a0712 100%);
+            --card-bg: rgba(20, 15, 30, 0.75);
+            --card-border: rgba(255, 56, 56, 0.2);
+            --text-main: #ffffff;
+            --text-sub: #dcdde1;
+            --shadow: 0 25px 50px rgba(0, 0, 0, 0.8);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        .falling-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+        }
+
+        .falling-element {
+            position: absolute;
+            top: -10%;
+            font-size: 1.3rem;
+            user-select: none;
+            animation: fall linear infinite;
+            opacity: 0.5;
+        }
+
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0.7; }
+            100% { transform: translateY(110vh) rotate(360deg); opacity: 0; }
+        }
+
+        .glow-bg {
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(255, 56, 56, 0.12) 0%, rgba(130, 88, 159, 0.05) 50%, rgba(0, 0, 0, 0) 70%);
+            top: 15%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+            filter: blur(50px);
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            background: var(--card-bg);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--card-border);
+            border-radius: 35px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: all 0.4s ease;
+        }
+
+        .lock-icon {
+            font-size: 4rem;
+            margin-bottom: 15px;
+            display: inline-block;
+            filter: drop-shadow(0 6px 20px rgba(255, 56, 56, 0.4));
+        }
+
+        h1 {
+            font-size: 1.9rem;
+            font-weight: 800;
+            margin-bottom: 15px;
+            color: #ff5252;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        p.desc {
+            font-size: 1.05rem;
+            color: var(--text-sub);
+            margin-bottom: 25px;
+            line-height: 1.8;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 18px;
+        }
+
+        input[type="password"], input[type="text"] {
+            width: 100%;
+            padding: 16px 20px;
+            border-radius: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-size: 1.15rem;
+            text-align: center;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input[type="password"]:focus, input[type="text"]:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(255, 56, 56, 0.3);
+        }
+
+        button.btn-main {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), #ff5252);
+            color: white;
+            border: none;
+            padding: 16px;
+            border-radius: 18px;
+            font-size: 1.15rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(255, 56, 56, 0.35);
+            transition: 0.3s;
+        }
+
+        button.btn-main:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 30px rgba(255, 56, 56, 0.5);
+        }
+
+        .hint-box {
+            margin-top: 18px;
+            padding: 12px;
+            border-radius: 14px;
+            background: rgba(255, 56, 56, 0.12);
+            color: #ff5252;
+            font-size: 0.95rem;
+            display: none;
+        }
+
+        .music-card {
+            background: rgba(10, 7, 18, 0.9);
+            border-radius: 22px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid rgba(255, 56, 56, 0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: inset 0 2px 8px rgba(255, 255, 255, 0.03);
+        }
+
+        .album-art-container {
+            width: 85px;
+            height: 85px;
+            margin: 0 auto;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 2px solid var(--primary);
+            box-shadow: 0 8px 20px rgba(255, 56, 56, 0.4);
+            animation: pulse-art 3s infinite ease-in-out;
+            background: linear-gradient(135deg, #ff5252 0%, #82589f 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .music-icon-symbol {
+            font-size: 2.2rem;
+            filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+        }
+
+        @keyframes pulse-art {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 20px rgba(255, 56, 56, 0.3); }
+            50% { transform: scale(1.06); box-shadow: 0 12px 25px rgba(255, 56, 56, 0.6); }
+        }
+
+        .music-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 1.08rem;
+            font-weight: 700;
+            color: #ff8787;
+        }
+
+        audio {
+            width: 100%;
+            height: 45px;
+            border-radius: 12px;
+            outline: none;
+        }
+
+        .message-content {
+            font-size: 1.12rem;
+            line-height: 2.2;
+            color: #f5f6fa;
+            white-space: pre-line;
+            margin: 20px 0;
+            text-align: right;
+            background: rgba(10, 7, 18, 0.75);
+            padding: 28px;
+            border-radius: 22px;
+            border-right: 5px solid var(--primary);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .locked-view {
+            text-align: center;
+            padding: 40px 20px;
+            background: rgba(10, 7, 18, 0.85);
+            border-radius: 22px;
+            border: 1px dashed rgba(255, 56, 56, 0.4);
+            margin: 20px 0;
+        }
+
+        .locked-icon-big {
+            font-size: 3.5rem;
+            margin-bottom: 15px;
+        }
+
+        .timer-display {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: #ff5252;
+            margin: 15px 0;
+            font-family: monospace;
+            letter-spacing: 2px;
+        }
+
+        .btn-timer {
+            background: linear-gradient(135deg, #ff3838, #ff5252);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 14px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 56, 56, 0.4);
+            transition: 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-timer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 56, 56, 0.6);
+        }
+
+        .secret-bypass-trigger {
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            width: 55px;
+            height: 55px;
+            background: rgba(255, 56, 56, 0.15);
+            border: 2px solid rgba(255, 56, 56, 0.4);
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            box-shadow: 0 4px 15px rgba(255, 56, 56, 0.3);
+            transition: 0.3s;
+        }
+        .secret-bypass-trigger:hover {
+            transform: scale(1.1);
+            background: rgba(255, 56, 56, 0.35);
+            border-color: var(--primary);
+        }
+
+        .secret-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 56, 56, 0.3);
+            display: none;
+        }
+
+        .days-nav {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            max-height: 230px;
+            overflow-y: auto;
+            padding-left: 4px;
+            padding-right: 4px;
+        }
+
+        .day-btn {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #b2bec3;
+            padding: 12px 6px;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.25s ease;
+        }
+
+        .day-btn:hover {
+            background: rgba(255, 56, 56, 0.2);
+            color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .day-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 5px 15px rgba(255, 56, 56, 0.4);
+        }
+
+        .day-btn.locked {
+            opacity: 0.4;
+            cursor: not-allowed;
+            border-style: dashed;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .shake {
+            animation: shake 0.4s ease-in-out;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-6px); }
+            40%, 80% { transform: translateX(6px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="falling-container" id="fallingContainer"></div>
+    <div class="glow-bg"></div>
+
+    <div class="secret-bypass-trigger" onclick="toggleSecretInput()" title="كود التجاوز">🔑</div>
+
+    <div class="container" id="loginCard">
+        <div class="lock-icon">🔐</div>
+        <h1>مكاني الخاص مع حنان ❤️</h1>
+        <p class="desc">هذا المكان ما يفتحه أحد غيرنا.. حطي الرقم الخاص بينا عشان تفتحي الحكايات والذكريات.</p>
+        
+        <div class="input-group">
+            <input type="password" id="passwordInput" placeholder="أدخلي الرقم..." onkeypress="handleKeyPress(event)">
+        </div>
+        
+        <button class="btn-main" onclick="checkPassword()">افتحي الذكريات ✨</button>
+        
+        <div id="hintBox" class="hint-box"></div>
+    </div>
+
+    <div class="container hidden" id="contentCard">
+        <h1 id="dayTitle">اليوم</h1>
+        
+        <div id="unlockedContent">
+            <div class="music-card">
+                <div class="album-art-container">
+                    <span class="music-icon-symbol">🎵</span>
+                </div>
+                <div class="music-info"><span id="songName">اسم الأغنية</span></div>
+                <audio id="audioPlayer" controls preload="auto"></audio>
+            </div>
+
+            <div class="message-content" id="dayMessage">جاري التحميل...</div>
+        </div>
+
+        <div id="lockedView" class="locked-view hidden">
+            <div class="locked-icon-big" id="lockedIconSymbol">⏳🔒</div>
+            <h3 id="lockedTitle" style="color: #ff5252; margin-bottom: 10px;">هذا اليوم مقفل حالياً</h3>
+            <p id="lockedDesc" style="color: var(--text-sub); font-size: 0.95rem; margin-bottom: 15px;">يجب فتح الأيام السابقة بالترتيب أولاً.</p>
+            <div id="timerDisplay" class="timer-display hidden">24:00:00</div>
+            <button id="startTimerBtn" class="btn-timer hidden" onclick="startCurrentDayTimer()">بدء العد التنازلي (24 ساعة) ⏰</button>
+
+            <div id="secretBox" class="secret-box">
+                <p style="font-size: 0.85rem; color: #ff8787; margin-bottom: 8px;">معاك كود تخطي لهذا اليوم؟ حطه هنا:</p>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="secretCodeInput" placeholder="أدخل الكود..." style="padding: 10px; font-size: 0.95rem;">
+                    <button onclick="verifySecretCode()" style="background: var(--primary); color: #fff; border: none; padding: 0 15px; border-radius: 12px; cursor: pointer; font-weight: 700;">فتح</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="days-nav" id="daysNav"></div>
+    </div>
+
+    <script>
+        // نظام إعادة الضبط (ريستارت) لنسخة الإصدار النهائي
+        const CURRENT_RESET_VERSION = "app_reset_v5_final";
+        if (!localStorage.getItem(CURRENT_RESET_VERSION)) {
+            localStorage.clear();
+            localStorage.setItem(CURRENT_RESET_VERSION, "true");
+            localStorage.setItem("unlocked_days", JSON.stringify(["16 أكتوبر"]));
+        }
+
+        function createFallingElements() {
+            const container = document.getElementById('fallingContainer');
+            const items = ['🌸', '🌹', '❤️', '✨', '💖', '🌷'];
+            for (let i = 0; i < 22; i++) {
+                const el = document.createElement('div');
+                el.className = 'falling-element';
+                el.innerText = items[Math.floor(Math.random() * items.length)];
+                el.style.left = Math.random() * 100 + 'vw';
+                el.style.animationDuration = (Math.random() * 5 + 6) + 's';
+                el.style.animationDelay = (Math.random() * 5) + 's';
+                container.appendChild(el);
+            }
+        }
+        createFallingElements();
+
+        const PASSWORD = "77"; 
+
+        const dailyContent = {
+            "16 أكتوبر": { secretCode: "7701", title: "16 أكتوبر - يوم ميلادك 🎂", songName: "راشد الماجد - غير عن كل الأعياد", audioUrl: "https://files.catbox.moe/78c1if.mp3", message: "كل سنة وأنتي بخير يا عيوني ويا أغلى ما أملك في هالدنيا يا حنان.. ❤️\n\nاليوم هذا مو يوم عادي، هذا اليوم اللي جيتي فيه على الدنيا ونورتيها، ويا بخت الأيام اللي أنتي فيها. مهما أخطأت ومهما باعدت بيننا الظروف والأيام، مكانك بقلبي ما يتغير ولا يملأه غيرك أبداً.\nكل عام وأنتي حبيبتي وضحكتي وسر سعادته، ويا رب سنة جديدة تجيب معك الفرح وتجمعنا من جديد على الحب والصفا زي الأول وأحسن ✨", isBirthday: true },
+            "17 أكتوبر": { secretCode: "7707", title: "17 أكتوبر - اعتذار ونقاء قلب 🤍", songName: "عايض - أوعدك", audioUrl: "https://files.catbox.moe/4tvk48.mp3", message: "أنا آسف إذا يوم قصرت معك أو ما عرفت أكون الشخص اللي يخفف عنك وقت ضيقتك، وآسف على كل كلمة أو تصرف صدر مني بدون قصد وزعلك.. 💔\n\nلكن يشهد الله إني ما دخلت هالعلاقة إلا وأنا أحبك من كل أعماق قلبي، ولا غليت أحد في هذه الدنيا مثل ما غليتك. يمكن ما أكون الحبيب المثالي، لكن والله إني كنت أحاول بكل طاقتي وجهدي أسعدك، وإذا خذلتك بيوم فصدقني ما كان هالشيء بقصد يا حنان.. سامحيني وابعدي كل زعل بيننا." },
+            "18 أكتوبر": { secretCode: "7777", title: "18 أكتوبر - تايه في الأماكن 🕯️", songName: "نبيل - تايه في الأماكن", audioUrl: "https://files.catbox.moe/f76djq.mp3", message: "تدرين وش كثر أحس إني تايه بدونك في هالأماكن؟ كل زاوية في مكاني تذكرني فيك، بضحكتك، بصوتك، وبكل لحظة حلوة جمعتنا مع بعض..\nأنتِ النبض اللي يرجع الحياة لقلبي، ومهما طال البعد وكل واحد فينا أخذته طرقه، الشوق يبقى يراودني ويكبر كل يوم أكثر من اللي قبله. متى نلتقي ونطوي هالبعاد؟" },
+            "19 أكتوبر": { secretCode: "7007", title: "19 أكتوبر - لي خل أمير 🌙", songName: "أمير - لي خل", audioUrl: "https://files.catbox.moe/d1skzn.mp3", message: "لي خلٍ أمير بطلته وحضوره وراقي بقلبه.. يملى عليّ الدنيا نور ويبعد عني كل ضيق وهم.\nمهما أخذتنا ظروف الأيام، يبقى غلاك في القلب ثابت ما يتغير أبداً يا أغلى وأثمن الناس.\nأدعي دايم إن الله يكتب لنا اللقاء القريب، وإن كل الأيام اللي جية تكون أجمّل بكثير من اللي راحت." },
+            "20 أكتوبر": { secretCode: "6767", title: "20 أكتوبر - أبعتذر (محمد عبده) ☕", songName: "محمد عبده - أبعتذر", audioUrl: "https://files.catbox.moe/3ghzrk.mp3", message: "أبعتذر عن كل شيء..\nعن كل قطرة دم بكت في وريدي..\nأبعتذر لنجومها في المجرة..\nمن زعلك لولاك أنا بالله وش فيني؟ ✨\n\nأعتذر لك من صميم قلبي عن كل تقصير أو زعل راح، وعن كل لحظة ما كنت فيها على قد الحلم. رضاك عندي بالدنيا وما فيها يا حنان." },
+            "21 أكتوبر": { secretCode: "3029", title: "21 أكتوبر - مهما صار 🕊️", songName: "عبادي الجوهر - مهما صار", audioUrl: "https://files.catbox.moe/tdfqdy.mp3", message: "مهما صار ومهما افترقنا وظروف الدنيا حادستنا، يبقى الوفاء هو عنواننا وتبقى المحبة الصادقة هي الرابط الوحيد اللي يجمعنا..\nأنا دايم على العهد وما أنسى كل اللحظات الجميلة اللي عشناها سوا، ولا يمكن يجي يوم وأفرط بالذكريات اللي بنيناها بجهدنا وحبنا." },
+            "22 أكتوبر": { secretCode: "6741", title: "22 أكتوبر - بترجعين ✨", songName: "راشد الماجد - بترجعين", audioUrl: "https://files.catbox.moe/91g75b.mp3", message: "متأكد إن الأيام راح تجمعنا من جديد، وإنك بترجعين لقلب ينبض بحبك ويحتريك بكل شوق واشتياق لا ينتهي..\nمكانك بانتظارك ومفتوح لك دائماً وباب قلبي ما ينقفل بوجهك أبداً يا حنان. تعالي ننسى كل ما فات ونفتح صفحة جديدة." },
+            "23 أكتوبر": { secretCode: "1285", title: "23 أكتوبر - كل حب فؤاد 💖", songName: "إهداء - كل حب فؤاد", audioUrl: "https://files.catbox.moe/gcuwjo.mp3", message: "كل حب يمر بحياتنا ويبقى أثره، بس حبك أنتِ غير وعن كل الناس.. أنتِ القرب اللي أتمناه دايم والقلب اللي ما ألقى زيه أبداً.\nعسى الله لا يحرمني منك ولا من طيبة قلبك اللي دايم تغمرني بكل حب." },
+            "24 أكتوبر": { secretCode: "4490", title: "24 أكتوبر - اعتذار واجيك 🤍", songName: "عايض - اعتذار واجيك", audioUrl: "https://files.catbox.moe/qcc9u9.mp3", message: "أنا جيتك اليوم اعتذر وأطلب رضاك، لأن رضاك عندي يسوى الدنيا وما فيها..\nما هان عليّ زعلك ولا هان عليّ أشوفك بعيدة عني. الله لا يغير علينا، ويجعل هالكلام يوصل لقلبك وينظف كل شائبة صارت بيننا." },
+            "25 أكتوبر": { secretCode: "8821", title: "25 أكتوبر - يهزك الشوق ☕", songName: "ماجد المهندس - يهزك الشوق", audioUrl: "https://files.catbox.moe/yi0h9r.mp3", message: "تدرين إن الشوق يجيني دايم ويذكرني فيك بكل وقت؟.. ترا حنيني لك أكبر من أي كلام، وكل لحن أسمعه يذكرني فيك ويخليني أتمنى إنك تسامحين وترجعين زي أول وأحسن.\nأنتِ الشخص اللي ما أقدر أستغني عنه أبداً." },
+            "26 أكتوبر": { secretCode: "5137", title: "26 أكتوبر - مذهلة 🌟", songName: "محمد عبده - مذهلة", audioUrl: "https://files.catbox.moe/iwxmpv.mp3", message: "وحدة بوحدة.. طبعك الحلو وجمالك يخلي الواحد يحتار وش يسميكِ، من كثر ما أنتِ مميزة بكل تفاصيلك وضحكتك اللي تفتح النفس..\nأنتِ الإنسانة اللي صعبة تكرر بالحياة، ومليتي عليّ كل أيامي فرح وسرور." },
+            "27 أكتوبر": { secretCode: "2094", title: "27 أكتوبر - طلعت أبيه 🌸", songName: "عايض - طلعت أبيه", audioUrl: "https://files.catbox.moe/5s90ew.mp3", message: "دورت غيرك في كل مكان بس لقيت نفسي راجع لك، لأنك بكل سماتك وجمالك طلعتي أنتي اللي أبيه وأنتي اللي أعشقه بصدق.\nوما صار للحياة طعم من دونك.. لا تبتعدين أكثر." },
+            "28 أكتوبر": { secretCode: "7650", title: "28 أكتوبر - لماح 💫", songName: "عايض - لماح", audioUrl: "https://files.catbox.moe/ykhez0.mp3", message: "أنتِ تفهميني بسرعة وتعرفين وش بخاطري حتى بدون ما أنطق بحرف.. وهذا أكثر شي يعجبني فيكِ وقربك مني.\nالله يديم بيننا هالمحبة والتفاهم ولا يغير علينا أبداً." },
+            "29 أكتوبر": { secretCode: "1182", title: "29 أكتوبر - طاري الزعل 🌿", songName: "اصيل و عايض - طاري الزعل", audioUrl: "https://files.catbox.moe/x4ej1i.mp3", message: "خلنا ننسى طاري الزعل والغياب، ونفتح صفحة جديدة بيضاء عنوانها أنتِ، نرجع فيها للضحكة والصفاء اللي تعودنا عليها..\nحنان، أنتِ أحن قلب عرفته بحياتي." },
+            "30 أكتوبر": { secretCode: "9436", title: "30 أكتوبر - المسافة 🕊️", songName: "عايض - المسافة", audioUrl: "https://files.catbox.moe/bdtxm3.mp3", message: "مهما بلغت المسافات والبعد بيننا، القلوب الصادقة تبقى قريبة والشوق يطوي كل هالبعد بثوانٍ..\nأنتِ قريبة من روحي مهما كانت الظروف." },
+            "31 أكتوبر": { secretCode: "3318", title: "31 أكتوبر - يا ابن الأوادم 🎈", songName: "عبدالمجيد عبدالله - يا أبن الأوادم", audioUrl: "https://files.catbox.moe/lh9wow.mp3", message: "يا أبن الأوادم كلامك الحلو دايم يغلبني وسرق قلبي.. ويا كثر ما أعشقك وأهيم فيك وفي رضاك وفي كل تفاصيلك الصغيرة.\nابقَ بجانبي دائماً ولا تحرمني منك." },
+            "1 نوفمبر": { secretCode: "6259", title: "1 نوفمبر - تناديك ✨", songName: "ماجد المهندس - تناديك", audioUrl: "https://files.catbox.moe/frkxzq.mp3", message: "روحي تناديك وتطلب قربك كل وقت، وما تبي غير رضاك ووصالك الدائم..\nأنتي الأمل اللي أنام وأصحى وأنا أفكر فيه." },
+            "2 نوفمبر": { secretCode: "4105", title: "2 نوفمبر - جيتني صدفة 🌟", songName: "احمد علوي - جيتني صدفه", audioUrl: "https://files.catbox.moe/fkhmu8.mp3", message: "مثل ما جيتني صدفة وحليت أيامي، أتمنى ترجعين تجمعنا الأيام على خير ومحبة وتدوم عشرتنا للأبد بدون عوائق." },
+            "3 نوفمبر": { secretCode: "8972", title: "3 نوفمبر - تجيني حلم 🌙", songName: "سلطان خليفه - تجيني حلم", audioUrl: "https://files.catbox.moe/h664d3.mp3", message: "حتى لو كنتِ بعيدة عني بالحقيقة، تجيني حلم وتزورني بكل ليلة، وأصحى على أمل إنك تكونين قريبة مني وأشوفك بخير وسلامة." },
+            "4 نوفمبر": { secretCode: "5834", title: "4 نوفمبر - قلت مش هتسيبني 💭", songName: "أميمة طالب - قلت مش هتسيبني", audioUrl: "https://files.catbox.moe/pn2dtd.mp3", message: "مو قلتي ما راح تسيبني ولا يهون عليك فراقي؟ تعالي نرجع نثبت لكل الظروف إن حبنا أقوى من أي زعل وأكبر من أي مشكلة مرت بيننا، لأننا نستاهل بعض بكل sincerity." },
+            "5 نوفمبر": { secretCode: "9999", title: "5 نوفمبر - أجمل فرحة 🎁", songName: "مهى فتوني - أجمل فرحة", audioUrl: "https://files.catbox.moe/kum7p2.mp3", message: "أجمل فرحة بعمري هي لما نرجع لبعض ونقفل صفحة الزعل للأبد.. أحبك يا حنان ويارب دايم أيامنا فرح والسعادة أبدية لا تنتهي! ❤️\n\nوفي ختام هذه المفاجأة، أتمنى إنا نكون وقتها رجعنا، وتشوفي آخر رسائلي في هذه المفاجأة بأن ربي يخليك لي ولا يحرمني منك يا أجمل أمنياتي وأجمل صدفة عرفتها في حياتي.. أتمنى نكون دايم لبعض وما يفرقنا أي شخص مهما كان ولأي سبب كان! ❤️✨\n\n(أحبك، مو بس أحبك، أعشقك وأهواك وأتنفسك يا أحلى بنوتة في حياتي)" }
+        };
+
+        const dayKeys = Object.keys(dailyContent);
+        let activeInterval = null;
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') checkPassword();
+        }
+
+        function checkPassword() {
+            const input = document.getElementById("passwordInput").value;
+            const card = document.getElementById("loginCard");
+            const hintBox = document.getElementById("hintBox");
+
+            if (input === PASSWORD) {
+                card.style.transform = "scale(0.95)";
+                card.style.opacity = "0";
+                setTimeout(() => {
+                    card.classList.add("hidden");
+                    const contentCard = document.getElementById("contentCard");
+                    contentCard.classList.remove("hidden");
+                    loadInitialDay();
+                }, 300);
+            } else {
+                card.classList.add("shake");
+                setTimeout(() => card.classList.remove("shake"), 400);
+                hintBox.style.display = "block";
+                hintBox.innerText = "الرقم مو مضبوط، ركزي في الرقم الخاص بينا! (77)";
+            }
+        }
+
+        function getUnlockedDays() {
+            return JSON.parse(localStorage.getItem("unlocked_days")) || ["16 أكتوبر"];
+        }
+
+        function unlockDay(dayKey) {
+            let unlocked = getUnlockedDays();
+            if (!unlocked.includes(dayKey)) {
+                unlocked.push(dayKey);
+                localStorage.setItem("unlocked_days", JSON.stringify(unlocked));
+            }
+        }
+
+        function getTimerData(dayKey) {
+            return JSON.parse(localStorage.getItem("timer_" + dayKey));
+        }
+
+        function saveTimerData(dayKey, endTime) {
+            localStorage.setItem("timer_" + dayKey, JSON.stringify({ endTime: endTime }));
+        }
+
+        function loadInitialDay() {
+            showDayContent(dayKeys[0]);
+            renderDaysNav(dayKeys[0]);
+        }
+
+        function triggerConfetti() {
+            if (typeof confetti === 'function') {
+                confetti({
+                    particleCount: 120,
+                    spread: 80,
+                    origin: { y: 0.6 },
+                    colors: ['#ff3838', '#d1d8e0', '#ff5252', '#82589f']
+                });
+            }
+        }
+
+        function toggleSecretInput() {
+            const secretBox = document.getElementById("secretBox");
+            secretBox.style.display = secretBox.style.display === "block" ? "none" : "block";
+        }
+
+        function verifySecretCode() {
+            const activeBtn = document.querySelector(".day-btn.active");
+            if (!activeBtn) return;
+            const currentDayKey = activeBtn.getAttribute("data-day");
+            const inputCode = document.getElementById("secretCodeInput").value.trim();
+
+            const expectedCode = dailyContent[currentDayKey].secretCode;
+
+            if (inputCode === expectedCode) {
+                unlockDay(currentDayKey);
+                localStorage.removeItem("timer_" + currentDayKey);
+                document.getElementById("secretCodeInput").value = "";
+                document.getElementById("secretBox").style.display = "none";
+                showDayContent(currentDayKey);
+                renderDaysNav(currentDayKey);
+                triggerConfetti();
+            } else {
+                alert("الكود خطأ! تأكدي من الكود الخاص بهذا اليوم.");
+            }
+        }
+
+        function showDayContent(dayKey) {
+            if (activeInterval) clearInterval(activeInterval);
+
+            const data = dailyContent[dayKey];
+            const titleElem = document.getElementById("dayTitle");
+            const msgElem = document.getElementById("dayMessage");
+            const songNameElem = document.getElementById("songName");
+            const audioPlayer = document.getElementById("audioPlayer");
+            
+            const unlockedContent = document.getElementById("unlockedContent");
+            const lockedView = document.getElementById("lockedView");
+
+            let unlockedDays = getUnlockedDays();
+            
+            if (unlockedDays.includes(dayKey)) {
+                titleElem.innerText = data.title;
+                unlockedContent.classList.remove("hidden");
+                lockedView.classList.add("hidden");
+
+                msgElem.innerText = data.message;
+                songNameElem.innerText = data.songName || "إهداء خاص";
+                
+                if (data.audioUrl) {
+                    audioPlayer.src = data.audioUrl;
+                    audioPlayer.load();
+                    audioPlayer.currentTime = 0;
+                    audioPlayer.play().catch(() => {});
+                }
+
+                if (data.isBirthday) {
+                    triggerConfetti();
+                }
+            } else {
+                titleElem.innerText = dayKey + " 🔒";
+                unlockedContent.classList.add("hidden");
+                lockedView.classList.remove("hidden");
+                audioPlayer.pause();
+
+                manageSequentialTimer(dayKey);
+            }
+        }
+
+        function manageSequentialTimer(dayKey) {
+            const timerDisplay = document.getElementById("timerDisplay");
+            const startBtn = document.getElementById("startTimerBtn");
+            const lockedDesc = document.getElementById("lockedDesc");
+            const lockedIconSymbol = document.getElementById("lockedIconSymbol");
+
+            let unlockedDays = getUnlockedDays();
+            const currentIndex = dayKeys.indexOf(dayKey);
+            const prevDayKey = dayKeys[currentIndex - 1];
+
+            const isNextInLine = unlockedDays.includes(prevDayKey);
+
+            if (!isNextInLine) {
+                timerDisplay.classList.add("hidden");
+                startBtn.classList.add("hidden");
+                lockedIconSymbol.innerText = "🔒";
+                lockedDesc.innerText = "يجب فتح الأيام السابقة بالترتيب أولاً للوصول إلى هذا اليوم.";
+            } else {
+                lockedIconSymbol.innerText = "⏳🔒";
+                let timerData = getTimerData(dayKey);
+
+                if (!timerData) {
+                    timerDisplay.classList.add("hidden");
+                    startBtn.classList.remove("hidden");
+                    lockedDesc.innerText = "اضغطي زر بدء العد التنازلي لتبدأ الـ 24 ساعة الخاصة بهذا اليوم!";
+                } else {
+                    startBtn.classList.add("hidden");
+                    timerDisplay.classList.remove("hidden");
+                    lockedDesc.innerText = "الوقت باقي ليفتح هذا اليوم:";
+                    runCountdown(timerData.endTime, dayKey);
+                }
+            }
+        }
+
+        function startCurrentDayTimer() {
+            const activeBtn = document.querySelector(".day-btn.active");
+            if (!activeBtn) return;
+            const currentBtnKey = activeBtn.getAttribute("data-day");
+            
+            const duration = 24 * 60 * 60 * 1000; 
+            const endTime = new Date().getTime() + duration;
+            
+            saveTimerData(currentBtnKey, endTime);
+            manageSequentialTimer(currentBtnKey);
+        }
+
+        function runCountdown(endTime, dayKey) {
+            const timerDisplay = document.getElementById("timerDisplay");
+
+            if (activeInterval) clearInterval(activeInterval);
+
+            activeInterval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+
+                if (distance <= 0) {
+                    clearInterval(activeInterval);
+                    timerDisplay.innerText = "00:00:00";
+                    unlockDay(dayKey);
+                    localStorage.removeItem("timer_" + dayKey);
+                    showDayContent(dayKey);
+                    renderDaysNav(dayKey);
+                } else {
+                    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                    timerDisplay.innerText = 
+                        String(hours).padStart(2, '0') + ":" + 
+                        String(minutes).padStart(2, '0') + ":" + 
+                        String(seconds).padStart(2, '0');
+                }
+            }, 1000);
+        }
+
+        function renderDaysNav(activeDayKey) {
+            const nav = document.getElementById("daysNav");
+            nav.innerHTML = "";
+            let unlockedDays = getUnlockedDays();
+
+            dayKeys.forEach((dk) => {
+                const btn = document.createElement("button");
+                btn.setAttribute("data-day", dk);
+                
+                let isUnlocked = unlockedDays.includes(dk);
+                
+                btn.className = `day-btn ${dk === activeDayKey ? 'active' : ''} ${!isUnlocked ? 'locked' : ''}`;
+                btn.innerText = `${dk} ${!isUnlocked ? '🔒' : ''}`;
+
+                btn.onclick = () => {
+                    showDayContent(dk);
+                    document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
+                    btn.classList.add("active");
+                };
+                nav.appendChild(btn);
+            });
+        }
+    </script>
+</body>
+</html>
