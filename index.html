@@ -27,7 +27,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* تخصيص شريط التمرير ليتناسب مع الثيم الغامق */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -151,6 +150,7 @@
             text-align: center;
             outline: none;
             transition: 0.3s;
+            letter-spacing: 3px;
         }
 
         input[type="password"]:focus, input[type="text"]:focus {
@@ -185,6 +185,7 @@
             color: #ff5252;
             font-size: 0.95rem;
             display: none;
+            line-height: 1.6;
         }
 
         .music-card {
@@ -297,37 +298,12 @@
             box-shadow: 0 8px 20px rgba(255, 56, 56, 0.6);
         }
 
-        .secret-bypass-trigger {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            width: 55px;
-            height: 55px;
-            background: rgba(255, 56, 56, 0.15);
-            border: 2px solid rgba(255, 56, 56, 0.4);
-            border-radius: 50%;
-            cursor: pointer;
-            z-index: 999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.6rem;
-            box-shadow: 0 4px 15px rgba(255, 56, 56, 0.3);
-            transition: 0.3s;
-        }
-        .secret-bypass-trigger:hover {
-            transform: scale(1.1);
-            background: rgba(255, 56, 56, 0.35);
-            border-color: var(--primary);
-        }
-
         .secret-box {
-            margin-top: 15px;
-            padding: 12px;
-            background: rgba(0, 0, 0, 0.4);
-            border-radius: 12px;
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 16px;
             border: 1px solid rgba(255, 56, 56, 0.3);
-            display: none;
         }
 
         .days-nav {
@@ -394,15 +370,13 @@
     <div class="falling-container" id="fallingContainer"></div>
     <div class="glow-bg"></div>
 
-    <div class="secret-bypass-trigger" onclick="toggleSecretInput()" title="كود التجاوز">🔑</div>
-
     <div class="container" id="loginCard">
         <div class="lock-icon">🔐</div>
         <h1>مكاني الخاص مع حنان ❤️</h1>
         <p class="desc">هذا المكان ما يفتحه أحد غيرنا.. حطي الرقم الخاص بينا عشان تفتحي الحكايات والذكريات.</p>
         
         <div class="input-group">
-            <input type="password" id="passwordInput" placeholder="أدخلي الرقم..." onkeypress="handleKeyPress(event)">
+            <input type="password" id="passwordInput" placeholder="أدخلي الرقم..." maxlength="4" onkeypress="handleKeyPress(event)">
         </div>
         
         <button class="btn-main" onclick="checkPassword()">افتحي الذكريات ✨</button>
@@ -432,11 +406,12 @@
             <div id="timerDisplay" class="timer-display hidden">24:00:00</div>
             <button id="startTimerBtn" class="btn-timer hidden" onclick="startCurrentDayTimer()">بدء العد التنازلي (24 ساعة) ⏰</button>
 
+            <!-- صندوق كود التخطي للأيام المقفلة -->
             <div id="secretBox" class="secret-box">
-                <p style="font-size: 0.85rem; color: #ff8787; margin-bottom: 8px;">معاك كود تخطي لهذا اليوم؟ حطه هنا:</p>
+                <p style="font-size: 0.9rem; color: #ff8787; margin-bottom: 10px;">معاك كود تخطي لهذا اليوم؟ حطه هنا:</p>
                 <div style="display: flex; gap: 8px;">
                     <input type="text" id="secretCodeInput" placeholder="أدخل الكود..." style="padding: 10px; font-size: 0.95rem;">
-                    <button onclick="verifySecretCode()" style="background: var(--primary); color: #fff; border: none; padding: 0 15px; border-radius: 12px; cursor: pointer; font-weight: 700;">فتح</button>
+                    <button onclick="verifySecretCode()" style="background: var(--primary); color: #fff; border: none; padding: 0 18px; border-radius: 12px; cursor: pointer; font-weight: 700;">فتح</button>
                 </div>
             </div>
         </div>
@@ -445,16 +420,20 @@
     </div>
 
     <script>
-        // نسخة ريستارت جديدة كلياً (تضمن مسح الذاكرة المؤقتة وإعادة كل الأيام مقفلة ما عدا الأول)
-        const CURRENT_RESET_VERSION = "app_reset_v12_full_fresh";
-        if (!localStorage.getItem(CURRENT_RESET_VERSION)) {
-            localStorage.clear();
-            localStorage.setItem(CURRENT_RESET_VERSION, "true");
-            localStorage.setItem("unlocked_days", JSON.stringify(["16 أكتوبر"]));
+        const CURRENT_RESET_VERSION = "app_reset_v14_safe";
+        try {
+            if (!localStorage.getItem(CURRENT_RESET_VERSION)) {
+                localStorage.clear();
+                localStorage.setItem(CURRENT_RESET_VERSION, "true");
+                localStorage.setItem("unlocked_days", JSON.stringify(["16 أكتوبر"]));
+            }
+        } catch (e) {
+            console.error("Storage error:", e);
         }
 
         function createFallingElements() {
             const container = document.getElementById('fallingContainer');
+            if (!container) return;
             const items = ['🌸', '🌹', '❤️', '✨', '💖', '🌷'];
             for (let i = 0; i < 22; i++) {
                 const el = document.createElement('div');
@@ -468,7 +447,8 @@
         }
         createFallingElements();
 
-        const PASSWORD = "77"; 
+        const PASSWORD = "7769"; 
+        let failedAttempts = 0;
 
         const dailyContent = {
             "16 أكتوبر": { secretCode: "7701", title: "فتاة أكتوبر 🎂", songName: "راشد الماجد - غير عن كل الأعياد", audioUrl: "https://files.catbox.moe/78c1if.mp3", message: "كل سنة وأنتي بخير يا عيوني ويا أغلى ما أملك في هالدنيا يا حنان.. ❤️\n\nاليوم هذا مو يوم عادي، هذا اليوم اللي جيتي فيه على الدنيا ونورتيها، ويا بخت الأيام اللي أنتي فيها. مهما أخطأت ومهما باعدت بيننا الظروف والأيام، مكانك بقلبي ما يتغير ولا يملأه غيرك أبداً.\nكل عام وأنتي حبيبتي وضحكتي وسر سعادته، ويا رب سنة جديدة تجيب معك الفرح وتجمعنا من جديد على الحب والصفا زي الأول وأحسن ✨", isBirthday: true },
@@ -486,7 +466,7 @@
             "28 أكتوبر": { secretCode: "7650", title: "طلعت أبيه 🌸", songName: "عايض - طلعت أبيه", audioUrl: "https://files.catbox.moe/5s90ew.mp3", message: "دورت غيرك في كل مكان بس لقيت نفسي راجع لك، لأنك بكل سماتك وجمالك طلعتي أنتي اللي أبيه وأنتي اللي أعشقه بصدق.\nوما صار للحياة طعم من دونك." },
             "29 أكتوبر": { secretCode: "1182", title: "لماح 💫", songName: "عايض - لماح", audioUrl: "https://files.catbox.moe/ykhez0.mp3", message: "أنتِ تفهميني بسرعة وتعرفين وش بخاطري حتى بدون ما أنطق بحرف.. وهذا أكثر شي يعجبني فيكِ وقربك مني.\nالله يديم بيننا هالمحبة والتفاهم." },
             "30 أكتوبر": { secretCode: "9436", title: "طاري الزعل 🌿", songName: "اصيل و عايض - طاري الزعل", audioUrl: "https://files.catbox.moe/x4ej1i.mp3", message: "خلنا ننسى طاري الزعل والغياب، ونفتح صفحة جديدة بيضاء عنوانها أنتِ، نرجع فيها للضحكة والصفاء اللي تعودنا عليها..\nحنان، أنتِ أحن قلب عرفته." },
-            "31 أكتوبر": { secretCode: "3318", title: "المسافة 🕊️️", songName: "عايض - المسافة", audioUrl: "https://files.catbox.moe/bdtxm3.mp3", message: "مهما بلغت المسافات والبعد بيننا، القلوب الصادقة تبقى قريبة والشوق يطوي كل هالبعد بثوانٍ..\nأنتِ قريبة من روحي مهما كانت الظروف." },
+            "31 أكتوبر": { secretCode: "3318", title: "المسافة 🕊", songName: "عايض - المسافة", audioUrl: "https://files.catbox.moe/bdtxm3.mp3", message: "مهما بلغت المسافات والبعد بيننا، القلوب الصادقة تبقى قريبة والشوق يطوي كل هالبعد بثوانٍ..\nأنتِ قريبة من روحي مهما كانت الظروف." },
             "1 نوفمبر": { secretCode: "6259", title: "يا ابن الأوادم 🎈", songName: "عبدالمجيد عبدالله - يا أبن الأوادم", audioUrl: "https://files.catbox.moe/lh9wow.mp3", message: "يا أبن الأوادم كلامك الحلو دايم يغلبني وسرق قلبي.. ويا كثر ما أعشقك وأهيم فيك وفي رضاك وفي كل تفاصيلك الصغيرة.\nابقَ بجانبي دائماً." },
             "2 نوفمبر": { secretCode: "4105", title: "تناديك ✨", songName: "ماجد المهندس - تناديك", audioUrl: "https://files.catbox.moe/frkxzq.mp3", message: "روحي تناديك وتطلب قربك كل وقت، وما تبي غير رضاك ووصالك الدائم..\nأنتي الأمل اللي أنام وأصحى وأنا أفكر فيه." },
             "3 نوفمبر": { secretCode: "8972", title: "جيتني صدفة 🌟", songName: "احمد علوي - جيتني صدفه", audioUrl: "https://files.catbox.moe/fkhmu8.mp3", message: "مثل ما جيتني صدفة وحليت أيامي، أتمنى ترجعين تجمعنا الأيام على خير ومحبة وتدوم عشرتنا للأبد بدون عوائق." },
@@ -499,11 +479,15 @@
         let activeInterval = null;
 
         function handleKeyPress(e) {
-            if (e.key === 'Enter') checkPassword();
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
         }
 
         function checkPassword() {
-            const input = document.getElementById("passwordInput").value;
+            const passwordInput = document.getElementById("passwordInput");
+            if (!passwordInput) return;
+            const input = passwordInput.value;
             const card = document.getElementById("loginCard");
             const hintBox = document.getElementById("hintBox");
 
@@ -513,19 +497,31 @@
                 setTimeout(() => {
                     card.classList.add("hidden");
                     const contentCard = document.getElementById("contentCard");
-                    contentCard.classList.remove("hidden");
-                    loadInitialDay();
+                    if (contentCard) {
+                        contentCard.classList.remove("hidden");
+                        loadInitialDay();
+                    }
                 }, 300);
             } else {
                 card.classList.add("shake");
                 setTimeout(() => card.classList.remove("shake"), 400);
+                failedAttempts++;
                 hintBox.style.display = "block";
-                hintBox.innerText = "الرقم مو مضبوط، ركزي في الرقم الخاص بينا! (77)";
+                
+                if (failedAttempts === 1) {
+                    hintBox.innerText = "توقعت أنك بتعرفي الرقم المفضل بيننا";
+                } else {
+                    hintBox.innerHTML = "توقعت أنك بتعرفي الرقم المفضل بيننا<br><span style='font-size:0.85rem; color:#ff9f43; margin-top:5px; display:inline-block;'>تلميح: الرقم المفضل بيننا + الرقم اللي نحبه</span>";
+                }
             }
         }
 
         function getUnlockedDays() {
-            return JSON.parse(localStorage.getItem("unlocked_days")) || ["16 أكتوبر"];
+            try {
+                return JSON.parse(localStorage.getItem("unlocked_days")) || ["16 أكتوبر"];
+            } catch (e) {
+                return ["16 أكتوبر"];
+            }
         }
 
         function unlockDay(dayKey) {
@@ -537,7 +533,11 @@
         }
 
         function getTimerData(dayKey) {
-            return JSON.parse(localStorage.getItem("timer_" + dayKey));
+            try {
+                return JSON.parse(localStorage.getItem("timer_" + dayKey));
+            } catch (e) {
+                return null;
+            }
         }
 
         function saveTimerData(dayKey, endTime) {
@@ -560,24 +560,20 @@
             }
         }
 
-        function toggleSecretInput() {
-            const secretBox = document.getElementById("secretBox");
-            secretBox.style.display = secretBox.style.display === "block" ? "none" : "block";
-        }
-
         function verifySecretCode() {
             const activeBtn = document.querySelector(".day-btn.active");
             if (!activeBtn) return;
             const currentDayKey = activeBtn.getAttribute("data-day");
-            const inputCode = document.getElementById("secretCodeInput").value.trim();
+            const secretCodeInput = document.getElementById("secretCodeInput");
+            if (!secretCodeInput) return;
+            const inputCode = secretCodeInput.value.trim();
 
             const expectedCode = dailyContent[currentDayKey].secretCode;
 
             if (inputCode === expectedCode) {
                 unlockDay(currentDayKey);
                 localStorage.removeItem("timer_" + currentDayKey);
-                document.getElementById("secretCodeInput").value = "";
-                document.getElementById("secretBox").style.display = "none";
+                secretCodeInput.value = "";
                 showDayContent(currentDayKey);
                 renderDaysNav(currentDayKey);
                 triggerConfetti();
@@ -601,14 +597,14 @@
             let unlockedDays = getUnlockedDays();
             
             if (unlockedDays.includes(dayKey)) {
-                titleElem.innerText = data.title;
-                unlockedContent.classList.remove("hidden");
-                lockedView.classList.add("hidden");
+                if (titleElem) titleElem.innerText = data.title;
+                if (unlockedContent) unlockedContent.classList.remove("hidden");
+                if (lockedView) lockedView.classList.add("hidden");
 
-                msgElem.innerText = data.message;
-                songNameElem.innerText = data.songName || "إهداء خاص";
+                if (msgElem) msgElem.innerText = data.message;
+                if (songNameElem) songNameElem.innerText = data.songName || "إهداء خاص";
                 
-                if (data.audioUrl) {
+                if (audioPlayer && data.audioUrl) {
                     audioPlayer.src = data.audioUrl;
                     audioPlayer.load();
                     audioPlayer.currentTime = 0;
@@ -619,10 +615,10 @@
                     triggerConfetti();
                 }
             } else {
-                titleElem.innerText = dayKey + " 🔒";
-                unlockedContent.classList.add("hidden");
-                lockedView.classList.remove("hidden");
-                audioPlayer.pause();
+                if (titleElem) titleElem.innerText = dayKey + " 🔒";
+                if (unlockedContent) unlockedContent.classList.add("hidden");
+                if (lockedView) lockedView.classList.remove("hidden");
+                if (audioPlayer) audioPlayer.pause();
 
                 manageSequentialTimer(dayKey);
             }
@@ -641,29 +637,29 @@
             const isNextInLine = unlockedDays.includes(prevDayKey);
 
             if (!isNextInLine) {
-                timerDisplay.classList.add("hidden");
-                startBtn.classList.add("hidden");
-                lockedIconSymbol.innerText = "🔒";
-                lockedDesc.innerText = "يجب فتح الأيام السابقة بالترتيب أولاً للوصول إلى هذا اليوم.";
+                if (timerDisplay) timerDisplay.classList.add("hidden");
+                if (startBtn) startBtn.classList.add("hidden");
+                if (lockedIconSymbol) lockedIconSymbol.innerText = "🔒";
+                if (lockedDesc) lockedDesc.innerText = "يجب فتح الأيام السابقة بالترتيب أولاً للوصول إلى هذا اليوم.";
             } else {
-                lockedIconSymbol.innerText = "⏳🔒";
+                if (lockedIconSymbol) lockedIconSymbol.innerText = "⏳🔒";
                 let timerData = getTimerData(dayKey);
 
                 if (!timerData) {
-                    timerDisplay.classList.add("hidden");
-                    startBtn.classList.remove("hidden");
-                    lockedDesc.innerText = "اضغطي زر بدء العد التنازلي لتبدأ الـ 24 ساعة الخاصة بهذا اليوم!";
+                    if (timerDisplay) timerDisplay.classList.add("hidden");
+                    if (startBtn) startBtn.classList.remove("hidden");
+                    if (lockedDesc) lockedDesc.innerText = "اضغطي زر بدء العد التنازلي لتبدأ الـ 24 ساعة الخاصة بهذا اليوم!";
                 } else {
-                    startBtn.classList.add("hidden");
-                    timerDisplay.classList.remove("hidden");
-                    lockedDesc.innerText = "الوقت باقي ليفتح هذا اليوم:";
+                    if (startBtn) startBtn.classList.add("hidden");
+                    if (timerDisplay) timerDisplay.classList.remove("hidden");
+                    if (lockedDesc) lockedDesc.innerText = "الوقت باقي ليفتح هذا اليوم:";
                     runCountdown(timerData.endTime, dayKey);
                 }
             }
         }
 
         function startCurrentDayTimer() {
-            const activeBtn = document.querySelector(".day-ybtn.active") || document.querySelector(".day-btn.active");
+            const activeBtn = document.querySelector(".day-btn.active");
             if (!activeBtn) return;
             const currentBtnKey = activeBtn.getAttribute("data-day");
             
@@ -685,7 +681,7 @@
 
                 if (distance <= 0) {
                     clearInterval(activeInterval);
-                    timerDisplay.innerText = "00:00:00";
+                    if (timerDisplay) timerDisplay.innerText = "00:00:00";
                     unlockDay(dayKey);
                     localStorage.removeItem("timer_" + dayKey);
                     showDayContent(dayKey);
@@ -695,16 +691,19 @@
                     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
                     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-                    timerDisplay.innerText = 
-                        String(hours).padStart(2, '0') + ":" + 
-                        String(minutes).padStart(2, '0') + ":" + 
-                        String(seconds).padStart(2, '0');
+                    if (timerDisplay) {
+                        timerDisplay.innerText = 
+                            String(hours).padStart(2, '0') + ":" + 
+                            String(minutes).padStart(2, '0') + ":" + 
+                            String(seconds).padStart(2, '0');
+                    }
                 }
             }, 1000);
         }
 
         function renderDaysNav(activeDayKey) {
             const nav = document.getElementById("daysNav");
+            if (!nav) return;
             nav.innerHTML = "";
             let unlockedDays = getUnlockedDays();
 
@@ -720,7 +719,6 @@
                 btn.onclick = () => {
                     showDayContent(dk);
                     document.querySelectorAll(".day-btn").forEach(b => b.classList.remove("active"));
-                    btn.classList.add("test-active day-btn active" ? "day-btn active" : "");
                     btn.classList.add("active");
                 };
                 nav.appendChild(btn);
